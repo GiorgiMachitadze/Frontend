@@ -93,6 +93,7 @@ const AuthForm = () => {
         if (data.errors) {
           setErrors(data.errors);
         } else {
+          resetForm();
           setErrors({ registration: "Credentials are already in use" });
         }
       } else {
