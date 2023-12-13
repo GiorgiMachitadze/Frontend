@@ -37,6 +37,7 @@ const AuthForm = () => {
       confirmPassword: "",
       newPassword: "",
     });
+    setErrors({});
   };
 
   const handleRegistration = async (event) => {
@@ -84,9 +85,16 @@ const AuthForm = () => {
         formData
       );
       resetForm();
+
+      console.log("Registration successful!");
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        setErrors({ registration: "Credentials are already in use" });
+        const { data } = error.response;
+        if (data.errors) {
+          setErrors(data.errors);
+        } else {
+          setErrors({ registration: "Credentials are already in use" });
+        }
       } else {
         console.error("Registration failed:", error.message);
       }
@@ -122,6 +130,8 @@ const AuthForm = () => {
       );
 
       resetForm();
+
+      console.log("Login successful!");
     } catch (error) {
       console.error("Login failed:", error.message);
     } finally {
@@ -157,6 +167,8 @@ const AuthForm = () => {
       );
 
       resetForm();
+
+      console.log("Password reset successful!");
     } catch (error) {
       console.error("Password reset failed:", error.message);
     } finally {
