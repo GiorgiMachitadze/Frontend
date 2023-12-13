@@ -126,14 +126,25 @@ const AuthForm = () => {
     try {
       const response = await axios.post(
         "http://localhost:3000/api/login",
-        formData
+        formData,
+        {
+          validateStatus: (status) => status >= 200 && status < 300,
+        }
       );
 
       resetForm();
 
-      console.log("Login successful!");
+      if (response.status === 200) {
+        console.log("Login successful!");
+      } else {
+        setErrors({ login: "Invalid credentials" });
+      }
     } catch (error) {
-      console.error("Login failed:", error.message);
+      if (error.response && error.response.status === 401) {
+        setErrors({ login: "Invalid credentials" });
+      } else {
+        console.error("Login failed:");
+      }
     } finally {
       setLoading(false);
     }
@@ -249,6 +260,7 @@ const AuthForm = () => {
 
       {showLoginForm && (
         <form className="LoginForm" onSubmit={handleLogin}>
+          {errors.login && <div className="error">{errors.login}</div>}
           <input
             type="text"
             placeholder="User Name"
