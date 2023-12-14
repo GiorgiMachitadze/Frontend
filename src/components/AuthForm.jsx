@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "../styles/AuthForm.css";
 
 const AuthForm = () => {
+  const navigate = useNavigate();
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showForgotPasswordForm, setShowForgotPasswordForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -135,16 +137,19 @@ const AuthForm = () => {
 
       resetForm();
 
+      console.log("Login response:", response);
+
       if (response.status === 200) {
+        const { token } = response.data;
+
+        console.log("Token after login:", token);
+
+        localStorage.setItem("token", token);
+
         console.log("Login successful!");
+        navigate("/main");
       } else {
         setErrors({ login: "Invalid credentials" });
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setErrors({ login: "Invalid credentials" });
-      } else {
-        console.error("Login failed:");
       }
     } finally {
       setLoading(false);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/BudgetForm.css";
 
 function BudgetForm() {
@@ -14,6 +14,10 @@ function BudgetForm() {
   const [budgetItems, setBudgetItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+
+  useEffect(() => {
+    fetchBudgetItems();
+  }, []);
 
   const handleCategoryChange = (e) => {
     const selectedCategory = e.target.value;
@@ -55,7 +59,7 @@ function BudgetForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newBudgetItem = {
@@ -67,33 +71,98 @@ function BudgetForm() {
       favorite: false,
     };
 
-    setBudgetItems((prevItems) => [...prevItems, newBudgetItem]);
+    try {
+      const response = await fetch("http://localhost:3000/api/add-budget", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newBudgetItem),
+      });
 
-    setFormData({
-      category: "",
-      subcategory: "",
-      paymentType: "",
-      moneyAmount: "",
-      creationDate: new Date().toISOString().split("T")[0],
-    });
+      if (response.ok) {
+        setBudgetItems((prevItems) => [...prevItems, newBudgetItem]);
 
-    setShowForm(false);
+        setFormData({
+          category: "",
+          subcategory: "",
+          paymentType: "",
+          moneyAmount: "",
+          creationDate: new Date().toISOString().split("T")[0],
+        });
+
+        setShowForm(false);
+      } else {
+        console.error("Error saving budget item");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
-  const handleDelete = (index) => {
-    setBudgetItems((prevItems) => prevItems.filter((_, i) => i !== index));
+  const handleDelete = async (index) => {
+    const deletedItem = budgetItems[index];
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/delete-budget/${deletedItem._id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        setBudgetItems((prevItems) => prevItems.filter((_, i) => i !== index));
+      } else {
+        console.error("Error deleting budget item");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
-  const handleFavorite = (index) => {
-    setBudgetItems((prevItems) =>
-      prevItems.map((item, i) =>
-        i === index ? { ...item, favorite: !item.favorite } : item
-      )
-    );
+  const handleFavorite = async (index) => {
+    const updatedItem = budgetItems[index];
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/favorite-budget/${updatedItem._id}`,
+        {
+          method: "PUT",
+        }
+      );
+
+      if (response.ok) {
+        setBudgetItems((prevItems) =>
+          prevItems.map((item, i) =>
+            i === index ? { ...item, favorite: !item.favorite } : item
+          )
+        );
+      } else {
+        console.error("Error updating favorite status");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const handleToggleFavorites = () => {
     setShowFavorites(!showFavorites);
+  };
+
+  const fetchBudgetItems = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/filter-budget");
+
+      if (response.ok) {
+        const data = await response.json();
+        setBudgetItems(data.budgetItems);
+      } else {
+        console.error("Error fetching budget items");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const filteredBudgetItems = showFavorites
