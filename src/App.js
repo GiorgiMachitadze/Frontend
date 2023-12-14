@@ -1,7 +1,8 @@
-import Welcome from "./pages/Welcome";
+import Main from "./pages/Main";
+// import Welcome from "./pages/Welcome";
 
 function App() {
-  return <Welcome />;
+  return <Main />;
 }
 
 export default App;
