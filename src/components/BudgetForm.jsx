@@ -118,6 +118,7 @@ function BudgetForm() {
               value={formData.category}
               onChange={handleCategoryChange}
               className="selectInput"
+              required
             >
               <option value="">Select Category</option>
               <option value="Income">Income</option>
@@ -132,6 +133,7 @@ function BudgetForm() {
               value={formData.subcategory}
               onChange={handleChange}
               className="selectInput"
+              required
             >
               <option value="">Select Subcategory</option>
               {subcategories.map((subcat) => (
@@ -149,6 +151,7 @@ function BudgetForm() {
               value={formData.paymentType}
               onChange={handleChange}
               className="selectInput"
+              required
             >
               <option value="">Select Payment Type</option>
               <option value="Cash">Cash</option>
@@ -164,6 +167,7 @@ function BudgetForm() {
               value={formData.moneyAmount}
               onChange={handleChange}
               className="textInput"
+              required
             />
           </label>
 
